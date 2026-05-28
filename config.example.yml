@@ -1,0 +1,48 @@
+# Playground configuration — example
+#
+# Copy this file to `config.yml`, fill it in for your team, and the scripts
+# can pick up values from here rather than hardcoded paths. The shipped
+# scripts have hardcoded placeholders today; switching them to read this
+# file is a small follow-up exercise.
+
+team:
+  # Your team or brand name. Used in messages and the from-spec skill.
+  name: "<Your Team Name>"
+  # CSS class / component prefix. e.g. "myteam" -> ".myteam-card"
+  prefix: "<your-prefix>"
+
+product:
+  # Friendly product name. Used in messages.
+  name: "<Your Product>"
+  # Paths AI is allowed to edit. Used by verify.sh and .claude/settings.json.
+  in_scope_paths:
+    - "src/components/**"
+    - "src/styles/**"
+    - "src/content/**"
+    - "playground/**"
+  # Where your design tokens live (single source of truth).
+  token_file: "src/styles/tokens.scss"
+  # Token variable prefix. e.g. "myteam" -> "$myteam-color-primary"
+  token_prefix: "<your-token-prefix>"
+
+refresh:
+  # What command to run after AI edits to make changes visible.
+  # Examples:
+  #   "docker exec my-app php /var/www/html/admin/cli/purge_caches.php"
+  #   "echo 'Hot reload — refresh your browser'"
+  #   "npm run build:dev"
+  command: "<your refresh command>"
+
+spec_source:
+  # If your team uses a PM workflow tool that produces structured specs,
+  # configure where to find them.
+  repo: "<org>/<repo>"             # e.g. "WiseTechGlobal/WTA.Product"
+  pattern: "**/initiatives/*/specs/*.md"
+
+preview:
+  # Where designers see the running product.
+  base_url: "http://localhost:<port>"
+
+figma:
+  # Optional. If you use Figma MCP for design tokens / components.
+  file_key: ""

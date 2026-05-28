@@ -1,0 +1,55 @@
+{
+  "_comment": "Permissions for the playground. Pre-approves common safe operations so non-engineers aren't approving 50 prompts per session. FILL IN: replace <YOUR-THEME-PATH> and <YOUR-PLUGIN-PATH> with your actual in-scope paths. Use the fewer-permission-prompts skill once with an engineer-led trial session to refine this list.",
+
+  "permissions": {
+    "allow": [
+      "Read",
+
+      "Edit(<YOUR-THEME-PATH>/**)",
+      "Edit(<YOUR-PLUGIN-PATH>/**)",
+      "Edit(playground/**)",
+      "Edit(CLAUDE.md)",
+      "Write(<YOUR-THEME-PATH>/**)",
+      "Write(<YOUR-PLUGIN-PATH>/**)",
+      "Write(playground/**)",
+
+      "Bash(./play:*)",
+      "Bash(./playground/scripts/verify.sh)",
+      "Bash(./playground/scripts/refresh.sh)",
+      "Bash(./playground/scripts/refresh.sh:*)",
+      "Bash(./playground/scripts/audit.sh)",
+      "Bash(./playground/scripts/audit.sh:*)",
+
+      "Bash(git status)",
+      "Bash(git status:*)",
+      "Bash(git diff)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout -b prototype/*)",
+      "Bash(git add playground/*)",
+      "Bash(git commit -m:*)"
+    ],
+
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git checkout main)",
+      "Bash(git checkout master)",
+      "Bash(rm -rf:*)",
+      "Bash(rm -f:*)",
+      "Bash(sudo:*)",
+
+      "Edit(**/db/**)",
+      "Edit(**/migrations/**)",
+      "Edit(composer.json)",
+      "Edit(package.json)",
+      "Edit(Gemfile)",
+      "Edit(requirements.txt)",
+      "Write(composer.json)",
+      "Write(package.json)",
+      "Write(Gemfile)",
+      "Write(requirements.txt)"
+    ]
+  }
+}

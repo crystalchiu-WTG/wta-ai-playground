@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# play — the playground's entry point.
+#
+# A thin wrapper around git and the helper scripts so non-engineers
+# (designers, PMs) don't need to remember the underlying commands.
+#
+# Usage:
+#   ./play new "<short description>"   start a new prototype branch
+#   ./play refresh                     reload the local product so changes appear
+#   ./play verify                      run the discipline checks
+#   ./play save                        commit your work as a draft
+#   ./play status                      show what's changed + which branch
+#   ./play discard                     throw away current prototype, back to main
+#   ./play help                        show this help
+#---END-HELP---
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLAYGROUND_DIR="$REPO_ROOT/playground"
+cd "$REPO_ROOT"
+
+cmd="${1:-help}"
+shift || true
+
+slugify() {
+    echo "$1" | tr '[:upper:]' '[:lower:]' \
+        | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' \
+        | cut -c1-50
+}
+
+case "$cmd" in
+    new)
+        if [[ -z "${1:-}" ]]; then
+            echo "What are you prototyping? Example:"
+            echo "  ./play new \"homepage hero variant\""
+            exit 1
+        fi
+        slug="$(slugify "$1")"
+        user="${USER:-user}"
+        branch="prototype/${user}/${slug}"
+
+        if ! git diff --quiet HEAD 2>/dev/null; then
+            echo "You have uncommitted changes. Save or discard them first:"
+            echo "  ./play save     # keep them as a draft"
+            echo "  ./play discard  # throw them away"
+            exit 1
+        fi
+
+        echo "Starting a new prototype: $1"
+        git checkout main 2>&1 | tail -1
+        git checkout -b "$branch" 2>&1 | tail -1
+        echo
+        echo "You're on a fresh branch. Open Claude Code and start prompting."
+        echo "When you're done, run:  ./play save"
+        ;;
+
+    refresh)
+        exec "$PLAYGROUND_DIR/scripts/refresh.sh" "$@"
+        ;;
+
+    verify)
+        exec "$PLAYGROUND_DIR/scripts/verify.sh" "$@"
+        ;;
+
+    save)
+        if git diff --quiet HEAD 2>/dev/null && [[ -z "$(git status --porcelain)" ]]; then
+            echo "Nothing to save — no changes since the last save."
+            exit 0
+        fi
+
+        branch="$(git branch --show-current)"
+        if [[ "$branch" == "main" || "$branch" == "master" ]]; then
+            echo "You're on $branch — start a prototype first:"
+            echo "  ./play new \"what you're working on\""
+            exit 1
+        fi
+
+        echo "Running discipline checks..."
+        if ! "$PLAYGROUND_DIR/scripts/verify.sh" >/dev/null 2>&1; then
+            echo
+            echo "Some checks didn't pass. Run them yourself to see what's wrong:"
+            echo "  ./play verify"
+            exit 1
+        fi
+
+        echo "Saving your work as a draft..."
+        git add -A
+        msg="${1:-prototype: work in progress on $branch}"
+        git commit -m "$msg" 2>&1 | tail -1
+        echo
+        echo "Saved. Your prototype is on branch: $branch"
+        echo "When the engineering team is ready to review, ask them to look at this branch."
+        ;;
+
+    status)
+        branch="$(git branch --show-current)"
+        echo "Current branch: $branch"
+        echo
+        if git diff --quiet HEAD 2>/dev/null && [[ -z "$(git status --porcelain)" ]]; then
+            echo "No unsaved changes."
+        else
+            echo "Unsaved changes:"
+            git status --short
+        fi
+        ;;
+
+    discard)
+        branch="$(git branch --show-current)"
+        if [[ "$branch" == "main" || "$branch" == "master" ]]; then
+            echo "Nothing to discard — you're already on $branch."
+            exit 0
+        fi
+        if [[ "$branch" != prototype/* ]]; then
+            echo "You're on $branch, which isn't a prototype branch. Refusing to discard."
+            echo "If you really want to, do it manually with git."
+            exit 1
+        fi
+
+        echo "Throwing away the prototype on branch: $branch"
+        read -p "Type the branch name to confirm: " confirm
+        if [[ "$confirm" != "$branch" ]]; then
+            echo "Doesn't match. Nothing changed."
+            exit 1
+        fi
+
+        git checkout main 2>&1 | tail -1
+        git branch -D "$branch" 2>&1 | tail -1
+        echo "Done. Back on main."
+        ;;
+
+    help|*)
+        sed -n '/^# play/,/^#---END-HELP---/p' "$0" \
+            | sed 's/^#---END-HELP---//' \
+            | sed 's/^# \{0,1\}//'
+        ;;
+esac
