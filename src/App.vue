@@ -142,7 +142,7 @@ const tableData = [
 
 body {
   margin: 0;
-  font-family: var(--p-font-family, system-ui, sans-serif);
+  font-family: 'DM Sans', system-ui, sans-serif;
   background: var(--p-surface-ground);
   color: var(--p-text-color);
 }
