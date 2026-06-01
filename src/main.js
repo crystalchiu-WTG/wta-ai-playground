@@ -7,6 +7,47 @@ import App from './App.vue'
 
 // WTA brand palette — CW Blue primary, DM Sans, WTA surface/text greys
 const WTAPreset = definePreset(Aura, {
+  primitive: {
+    green: {
+      50:  '#f0fdf6',
+      100: '#dcfcea',
+      200: '#b7f5d1',
+      300: '#7ae8ab',
+      400: '#3dd37e',
+      500: '#18794E',
+      600: '#146642',
+      700: '#105335',
+      800: '#0c4028',
+      900: '#082d1c',
+      950: '#041a10'
+    },
+    orange: {
+      50:  '#fffbeb',
+      100: '#fef3c7',
+      200: '#fde68a',
+      300: '#fcd34d',
+      400: '#fbbf24',
+      500: '#c97a00',
+      600: '#a86500',
+      700: '#875000',
+      800: '#663d00',
+      900: '#4a2c00',
+      950: '#2d1a00'
+    },
+    red: {
+      50:  '#fff1f2',
+      100: '#ffe4e5',
+      200: '#fecdd0',
+      300: '#fda4a8',
+      400: '#fb7177',
+      500: '#CE2C31',
+      600: '#aa2429',
+      700: '#881c20',
+      800: '#661519',
+      900: '#450e11',
+      950: '#280709'
+    }
+  },
   semantic: {
     primary: {
       50:  '#f0eeff',
